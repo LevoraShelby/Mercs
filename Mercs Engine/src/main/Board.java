@@ -86,7 +86,7 @@ public final class Board {
 
 	/**
 	 * @param tile the Tile that the piece is on.
-	 * @return the piece (an index for pieceIndexes) on tile. Returns -1 if
+	 * @return the piece (an index for pieceIndexes) on tile. Returns null if
 	 * there is no piece on tile.
 	 */
 	public Integer pieceOnTile(Tile tile) {
@@ -100,7 +100,8 @@ public final class Board {
 
 	/**
 	 * @param piece the piece to locate a Tile for.
-	 * @return the Tile that piece is on.
+	 * @return the Tile that piece is on. Returns null if the piece isn't on
+	 * the board.
 	 */
 	public Tile tileForPiece(Integer piece) {
 		Integer tileIndexForPiece = tileIndexesOfPieces.get(piece);
