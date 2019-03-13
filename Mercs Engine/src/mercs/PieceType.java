@@ -2,8 +2,8 @@ package mercs;
 
 public enum PieceType {
 	PAWN,
-	FERTZ,
-	WIZAR,
+	FERZ,
+	WAZIR,
 	KNIGHT,
 	COMMANDO
 }

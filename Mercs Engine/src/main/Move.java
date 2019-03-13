@@ -10,7 +10,7 @@ package main;
  * @author trevor
  */
 public final class Move {
-	private Integer piece;
+	private final Integer piece;
 	private final Tile newPosition;
 
 
