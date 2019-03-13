@@ -13,6 +13,8 @@ import mercs.info.GameInfo;
 
 
 /**
+ * A utility class for the display package.
+ * 
  * Read https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
  * for information on select graphic rendition codes.
  */
