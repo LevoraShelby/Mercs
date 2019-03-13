@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import console.BoardDisplay;
-import console.MovementView;
-import console.SelectionView;
+import display.BoardDisplay;
+import display.MovementView;
+import display.SelectionView;
 import mercs.info.GameInfo;
 import test.MercsStartingGameInfo;
 

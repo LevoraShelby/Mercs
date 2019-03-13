@@ -1,4 +1,4 @@
-package console;
+package display;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,8 +118,8 @@ public class BoardDisplay {
 			if(piece == null) continue;
 			String display = " ";
 			PieceType type = info.pieceToInfo().get(piece).type();
-			Integer blackPlayer = info.order().secondPlayer();
-			if(info.playerToInfo().get(blackPlayer).pieces().contains(piece)) {
+			Integer whitePlayer = info.order().firstPlayer();
+			if(info.playerToInfo().get(whitePlayer).pieces().contains(piece)) {
 				if(type == PieceType.PAWN) display = "\u2659";
 				else if(type == PieceType.FERZ) display = "\u2657";
 				else if(type == PieceType.WAZIR) display = "\u2656";

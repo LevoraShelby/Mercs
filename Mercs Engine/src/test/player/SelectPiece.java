@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import console.GamePrinter;
+import display.GamePrinter;
 import main.Tile;
 import main.Move;
 import mercs.info.GameInfo;

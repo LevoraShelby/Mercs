@@ -1,4 +1,4 @@
-package console;
+package display;
 
 import java.util.Arrays;
 import java.util.Iterator;
