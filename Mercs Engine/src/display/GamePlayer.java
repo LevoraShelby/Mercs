@@ -6,12 +6,10 @@ import java.util.Scanner;
 
 import main.Tile;
 import mercs.BuyRound;
-import mercs.MoveRound;
+import mercs.MercsStartingGameInfo;
 import mercs.PieceType;
 import mercs.PlayState;
 import mercs.info.GameInfo;
-import test.MercsStartingGameInfo;
-import test.player.SelectPiece;
 
 
 
@@ -70,23 +68,24 @@ public class GamePlayer {
 	private static GameInfo playMoveRound(
 		GameInfo info, Map<Tile, String> tileToDisplay, Scanner in
 	) {
-		MoveRound round = new MoveRound(info);
-
-		
-		while(true) {
-			String[] command = in.nextLine().split(" ");
-			if(command[0].equals("move")) {
-				Integer piece = Integer.parseInt(command[1]);
-				int playIndex = Integer.parseInt(command[2]);
-				return round.play(piece, playIndex);
-			}
-			else if(command[0].equals("pieces")) {
-				SelectPiece.selectPiece(info, tileToDisplay, in);
-			}
-			else {
-				throw new RuntimeException();
-			}	
-		}
+//		MoveRound round = new MoveRound(info);
+//
+//		
+//		while(true) {
+//			String[] command = in.nextLine().split(" ");
+//			if(command[0].equals("move")) {
+//				Integer piece = Integer.parseInt(command[1]);
+//				int playIndex = Integer.parseInt(command[2]);
+//				return round.play(piece, playIndex);
+//			}
+//			else if(command[0].equals("pieces")) {
+//				SelectPiece.selectPiece(info, tileToDisplay, in);
+//			}
+//			else {
+//				throw new RuntimeException();
+//			}	
+//		}
+		return null;
 	}
 
 

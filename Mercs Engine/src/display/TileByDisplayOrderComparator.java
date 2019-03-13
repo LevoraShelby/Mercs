@@ -12,12 +12,9 @@ import main.Tile;
  * player), where tiles that would be printed out before are ordered before
  * tiles that would be printed out after.
  * 
- * 
  * Example:
- * 
  * 1 2
  * 3 4
- * 
  * Tile 1 comes before tile 2, tile 2 before tile 3, and so on.
  * @author trevor
  */

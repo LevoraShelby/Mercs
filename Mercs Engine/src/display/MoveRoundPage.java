@@ -4,10 +4,10 @@ import java.util.Scanner;
 
 import main.Move;
 import main.Tile;
+import mercs.MercsStartingGameInfo;
 import mercs.MoveRound;
 import mercs.info.GameInfo;
 import mercs.info.PlayerInfo;
-import test.MercsStartingGameInfo;
 
 
 

@@ -1,21 +1,10 @@
 package mercs.info;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import main.Board;
-import main.Tile;
-
-import mercs.PieceType;
-import mercs.PlayState;
-import mercs.TurnState;
-import mercs.pieceLogics.Leaper;
-import test.Forward;
 
 
 
@@ -210,56 +199,6 @@ public class GameInfo {
 		}
 
 		return null;
-	}
-
-
-	/**
-	 * @return a Game of player 1 against player 2 using pieces 0 and 1. Player
-	 * 1 has piece 0, and Player 2 has piece 1. Both pieces are pawns using the
-	 * Forward logic. Piece 1 starts off on the bottom left Tile (1, 1), and
-	 * piece 2 starts off on the top right Tile (5, 5). The board is square.
-	 * The game has player 1 starting on the MOVE round. Neither player has
-	 * captured a piece thus far, and neither player has any cooldown.
-	 */
-	public static GameInfo testGame() {
-		Board board = Board.squareBoard(
-			6,
-			Arrays.asList(
-				new Tile(1,1), new Tile(5,5), new Tile(2,2), null
-			)
-		);
-
-		Map<Integer, PieceInfo> pieceToInfo = new HashMap<>();
-		for(Integer piece : board.pieces()) {
-			PieceInfo info = new PieceInfo(
-				PieceType.PAWN,
-				new Forward(piece, board)
-			);
-			pieceToInfo.put(piece, info);
-		}
-
-		pieceToInfo.put(3, new PieceInfo(PieceType.FERZ,Leaper.ferz(3,board)));
-
-		List<Integer> players = Arrays.asList(1, 2);
-		Map<Integer, PlayerInfo> playerToInfo = new HashMap<>();
-		for(int i = 0; i < players.size(); i++) {
-			Integer player = players.get(i);
-			Set<Integer> playerPieces = 
-				new HashSet<>(Arrays.asList((player * 2) - 2, (player * 2) - 1));
-
-			playerToInfo.put(
-				player,
-				new PlayerInfo(playerPieces, 0, 0)
-			);
-		}
-
-		OrderInfo order = new OrderInfo(
-			new TurnState(players.get(0), PlayState.MOVE),
-			players.get(0),
-			players.get(1)
-		);
-
-		return new GameInfo(board, pieceToInfo, playerToInfo, order);
 	}
 
 

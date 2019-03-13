@@ -106,7 +106,6 @@ public class BoardDisplay {
 				rank;
 		}
 
-
 		return griddedDisplay;
 	}
 

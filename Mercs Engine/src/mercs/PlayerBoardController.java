@@ -1,15 +1,11 @@
 package mercs;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import main.Board;
 import main.Move;
 import main.RecordBasedMoveLogic;
-import main.Tile;
-import test.Forward;
 
 
 
@@ -80,35 +76,5 @@ public class PlayerBoardController {
 		}
 		
 		return playerToPieceToML;
-	}
-
-
-	public static void main(String[] args) {
-		List<Tile> pieceLocations = new ArrayList<Tile>();
-		pieceLocations.add(new Tile(1, 1));
-		pieceLocations.add(new Tile(3, 1));
-		Board board = Board.squareBoard(5, pieceLocations);
-
-		Map<Integer, RecordBasedMoveLogic> player1Pieces =
-			new HashMap<Integer, RecordBasedMoveLogic>();
-		Map<Integer, RecordBasedMoveLogic> player2Pieces =
-			new HashMap<Integer, RecordBasedMoveLogic>();
-
-		player1Pieces.put(0, new Forward(0, board));
-		player2Pieces.put(1, new Forward(1, board));
-
-		Map<Integer, Map<Integer, RecordBasedMoveLogic>> playerToPieceToML =
-			new HashMap<Integer, Map<Integer, RecordBasedMoveLogic>>();
-		playerToPieceToML.put(1, player1Pieces);
-		playerToPieceToML.put(2, player2Pieces);
-
-		System.out.println(board);
-		PlayerBoardController pbc;
-		for(int i = 0; i < 5; i++) {
-			pbc = new PlayerBoardController(board, playerToPieceToML);
-			board = pbc.makePlay((i % 2), 0);
-			System.out.println(board);
-			playerToPieceToML = pbc.update(board, pbc.pieceToPlays((i % 2) + 1).get(i % 2)[0]);
-		}
 	}
 }
