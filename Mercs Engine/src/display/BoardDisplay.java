@@ -87,22 +87,20 @@ public class BoardDisplay {
 
 
 	public static String[] addGrid(String[] boardDisplay, int numFiles) {
-		String[] griddedDisplay = new String[boardDisplay.length + 4];
+		String[] griddedDisplay = new String[boardDisplay.length + 2];
 		String sgrBold = "\u001b[1m";
 		String sgrReset = "\u001b[m";
-		String files = "    ";
+		String files = "   ";
 		for(int i = 0; i < numFiles; i++) {
-			files += sgrBold + (char) (97 + i) + "  " + sgrReset;
+			files += sgrBold + (char) (97 + i) + " " + sgrReset;
 		}
 		griddedDisplay[0] = files;
-		griddedDisplay[1] = "";
 		griddedDisplay[griddedDisplay.length - 1] = files;
-		griddedDisplay[griddedDisplay.length - 2] = "";
 		
 		for(int i = 0; i < boardDisplay.length; i++) {
 			String rank = sgrBold + String.valueOf(boardDisplay.length - i) + 
 				sgrReset;
-			griddedDisplay[i + 2] = rank + "   " + boardDisplay[i] + "   " + 
+			griddedDisplay[i + 1] = rank + " " + boardDisplay[i] + " " + 
 				rank;
 		}
 

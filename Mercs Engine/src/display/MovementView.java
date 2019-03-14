@@ -9,9 +9,6 @@ import mercs.info.GameInfo;
 
 
 public class MovementView {
-	private static final String SGR_SELECTED = "\u001b[5m";
-	private static final String SGR_RESET = "\u001b[m";
-
 	private final GameInfo info;
 	private final Integer selectedPiece;
 
@@ -25,17 +22,25 @@ public class MovementView {
 	public String[] display() {
 		Map<Tile, SgrString> tileToDisplay;
 		if(selectedPiece != null) {
-			tileToDisplay = tileToDisplay();
+			tileToDisplay = tileToDisplayFromSelectedPiece();
 		}
 		else {
 			tileToDisplay = Display.tileToDisplay(info);
 		}
 
-		List<String> display = new ArrayList<>();
+		/**
+		 * Stops the color of the last tile from bleeding through the rest of
+		 * the line.
+		 */
+		String[] display = Display.boardDisplay(tileToDisplay);
+		for(int i = 0; i < display.length; i++) {
+			display[i] = display[i] + "\u001b[m";
+		}
+		return display;
 	}
 
 
-	private Map<Tile, SgrString> tileToDisplay() {
+	private Map<Tile, SgrString> tileToDisplayFromSelectedPiece() {
 		Map<Tile, SgrString> tileToDisplay = Display.tileToDisplay(info);
 
 		Move[][] plays = info.pieceToInfo().get(selectedPiece).logic().plays();
@@ -46,13 +51,17 @@ public class MovementView {
 			 */
 			Tile tile = play[play.length - 1].newPosition();
 			SgrString display = tileToDisplay.get(tile);
-			//Makes the display blink in order to give it a 
+			
 			display = display.changeBackground(display.background().darker());
 			tileToDisplay.put(tile, display);
 		}
 
 		Tile tileOfSelectedPiece = info.board().tileForPiece(selectedPiece);
 		SgrString display = tileToDisplay.get(tileOfSelectedPiece);
+		/**
+		 * Makes the selected piece blink so the user knows which piece is
+		 * selected.
+		 */
 		display = display.changeBlinking(true);
 		tileToDisplay.put(tileOfSelectedPiece, display);
 

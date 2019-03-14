@@ -22,6 +22,35 @@ import mercs.info.GameInfo;
 public class Display {
 	/**
 	 * @param info A game of Mercs.
+	 * @return An array of strings, with each string representing a line of
+	 * text that displays part of the board for the Mercs game. They are
+	 * ordered such that, when printed line-by-line, it will display the board.
+	 * NOTE: Right now this method only actively supports square boards with
+	 * contiguous ranks of tiles.
+	 */
+	public static String[] boardDisplay(Map<Tile, SgrString> tileToDisplay) {
+		Tile[] tiles = sortedTiles(tileToDisplay.keySet());
+		List<String> boardDisplay = new ArrayList<>();
+
+		int currentRank = -1;
+		for(Tile tile : tiles) {
+			if(tile.rank() != currentRank) {
+				boardDisplay.add("");
+				currentRank = tile.rank();
+			}
+
+			int i = boardDisplay.size() - 1;
+			String line = boardDisplay.get(i);
+			line += tileToDisplay.get(tile);
+			boardDisplay.set(i, line);
+		}
+
+		return boardDisplay.toArray(new String[boardDisplay.size()]);
+	}
+
+
+	/**
+	 * @param info A game of Mercs.
 	 * @return A mapping of tiles on info's board to how that tile can be
 	 * displayed.
 	 */
