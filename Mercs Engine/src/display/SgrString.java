@@ -12,14 +12,6 @@ import java.awt.Color;
  * @author trevor
  */
 public final class SgrString {
-	public static void main(String[] args) {
-		System.out.println(new SgrString("Hello")
-			.changeBlinking(true)
-			.changeBackground(Color.RED)
-		);
-	}
-
-
 	private final String base;
 	private final Color foreground;
 	private final Color background;
