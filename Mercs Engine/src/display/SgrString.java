@@ -173,7 +173,7 @@ public final class SgrString {
 
 
 	public SgrString changeForeground(Color foreground) {
-		if(this.foreground.equals(foreground)) {
+		if(this.foreground != null && this.foreground.equals(foreground)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -186,7 +186,7 @@ public final class SgrString {
 
 
 	public SgrString changeBackground(Color background) {
-		if(this.background.equals(background)) {
+		if(this.background !=null && this.background.equals(background)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -199,7 +199,7 @@ public final class SgrString {
 
 
 	public SgrString changeBold(Boolean bold) {
-		if(this.bold.equals(bold)) {
+		if(this.bold != null && this.bold.equals(bold)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -207,7 +207,7 @@ public final class SgrString {
 
 
 	public SgrString changeBlinking(Boolean blinking) {
-		if(this.blinking.equals(blinking)) {
+		if(this.blinking != null && this.blinking.equals(blinking)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
