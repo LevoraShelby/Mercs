@@ -78,12 +78,12 @@ public class Display {
 	 * @param tiles A collection of tiles that need to be ordered.
 	 * @return A new list of tiles, sorted by their print order.
 	 */
-	public static List<Tile> sortedTiles(Collection<Tile> tiles) {
+	public static Tile[] sortedTiles(Collection<Tile> tiles) {
 		TileByDisplayOrderComparator tileComparator = 
 			new TileByDisplayOrderComparator();
 		List<Tile> sortedTiles = new ArrayList<>(tiles);
 		sortedTiles.sort(tileComparator);
-		return sortedTiles;
+		return sortedTiles.toArray(new Tile[sortedTiles.size()]);
 	}
 
 

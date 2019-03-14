@@ -10,7 +10,6 @@ import mercs.info.GameInfo;
 
 public class MovementView {
 	private static final String SGR_SELECTED = "\u001b[5m";
-	private static final String SGR_VULNERABLE = "\u001b[7m";
 	private static final String SGR_RESET = "\u001b[m";
 
 	private final GameInfo info;
@@ -24,39 +23,37 @@ public class MovementView {
 
 
 	public String[] display() {
-		Map<Tile, String> tileToDisplay;
+		Map<Tile, SgrString> tileToDisplay;
 		if(selectedPiece != null) {
 			tileToDisplay = tileToDisplay();
 		}
 		else {
-			tileToDisplay = BoardDisplay.tileToDisplay(info);
+			tileToDisplay = Display.tileToDisplay(info);
 		}
 
-		return GamePrinter.gameToString(
-			info.board().tiles(), tileToDisplay, "X"
-		).split("\n");
+		List<String> display = new ArrayList<>();
 	}
 
 
-	private Map<Tile, String> tileToDisplay() {
-		Map<Tile, String> tileToDisplay = BoardDisplay.tileToDisplay(info);
+	private Map<Tile, SgrString> tileToDisplay() {
+		Map<Tile, SgrString> tileToDisplay = Display.tileToDisplay(info);
 
 		Move[][] plays = info.pieceToInfo().get(selectedPiece).logic().plays();
 		for(Move[] play : plays) {
+			/**
+			 * Gets the display for the tile that the current play has the
+			 * selected piece moving to.
+			 */
 			Tile tile = play[play.length - 1].newPosition();
-
-			String display = tileToDisplay.get(tile);
-			if(display == null) {
-				display = "X";
-			}
-			display = SGR_VULNERABLE + display + SGR_RESET;
-
+			SgrString display = tileToDisplay.get(tile);
+			//Makes the display blink in order to give it a 
+			display = display.changeBackground(display.background().darker());
 			tileToDisplay.put(tile, display);
 		}
 
 		Tile tileOfSelectedPiece = info.board().tileForPiece(selectedPiece);
-		String display = tileToDisplay.get(tileOfSelectedPiece);
-		display = SGR_SELECTED + display + SGR_RESET;
+		SgrString display = tileToDisplay.get(tileOfSelectedPiece);
+		display = display.changeBlinking(true);
 		tileToDisplay.put(tileOfSelectedPiece, display);
 
 		return tileToDisplay;
