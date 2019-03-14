@@ -20,15 +20,14 @@ public final class SgrString {
 
 
 	/**
-	 * Constructs an SgrString.
 	 * @param base The string that SgrString will place SGR effects on.
-	 * @param foreground The color of base's text. If null, foreground is not
-	 * changed.
-	 * @param background The color behind base's text. If null, background is
-	 * not changed.
-	 * @param bold Whether or not the base's text will be bold. If null, the
+	 * @param foreground The color of the base text. If null, the color of the
+	 * base text is not changed.
+	 * @param background The color behind the base text. If null, the color 
+	 * behind the base text is not changed.
+	 * @param bold Whether or not the base text will be bold. If null, the
 	 * bold effect is not changed.
-	 * @param blinking Whether or not the base's text will be blinking. If
+	 * @param blinking Whether or not the base text will be blinking. If
 	 * null, the blinking effect is not changed.
 	 */
 	public SgrString(
@@ -105,42 +104,61 @@ public final class SgrString {
 	}
 
 
+	/**
+	 * @return The string that SgrString places effects on.
+	 */
 	public String base() {
 		return base;
 	}
 
 
+	/**
+	 * @return The color of the base text. If null, the color of the base text
+	 * will not be changed.
+	 */
 	public Color foreground() {
 		return foreground;
 	}
 
 
 	/**
-	 * @return The foreground.
+	 * @return Equivalent to foreground().
 	 */
 	public Color fg() {
 		return foreground;
 	}
 
 
+	/**
+	 * @return The color behind the base text. If null, the color behind the
+	 * base text is not changed.
+	 */
 	public Color background() {
 		return background;
 	}
 
 
 	/**
-	 * @return The background.
+	 * @return Equivalent to background().
 	 */
 	public Color bg() {
 		return background;
 	}
 
 
+	/**
+	 * @return Whether or not the base text will be bold. If null, the bold
+	 * effect will not be changed.
+	 */
 	public Boolean bold() {
 		return bold;
 	}
 
 
+	/**
+	 * @return Whether or not the base text will be bold. If null, the blinking
+	 * effect will not be changed.
+	 */
 	public Boolean blinking() {
 		return blinking;
 	}
