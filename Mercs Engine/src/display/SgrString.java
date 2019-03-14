@@ -136,13 +136,18 @@ public final class SgrString {
 	}
 
 
-	public boolean bold() {
+	public Boolean bold() {
 		return bold;
 	}
 
 
-	public boolean blinking() {
+	public Boolean blinking() {
 		return blinking;
+	}
+
+
+	public SgrString changeBase(String base) {
+		return new SgrString(base, foreground, background, bold, blinking);
 	}
 
 
@@ -171,7 +176,7 @@ public final class SgrString {
 	}
 
 
-	public SgrString toggleBlink() {
+	public SgrString toggleBlinking() {
 		return new SgrString(base, foreground, background, bold, !blinking);
 	}
 }
