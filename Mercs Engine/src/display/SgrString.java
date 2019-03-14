@@ -171,12 +171,12 @@ public final class SgrString {
 	}
 
 
-	public SgrString toggleBold() {
-		return new SgrString(base, foreground, background, !bold, blinking);
+	public SgrString changeBold(Boolean bold) {
+		return new SgrString(base, foreground, background, bold, blinking);
 	}
 
 
-	public SgrString toggleBlinking() {
-		return new SgrString(base, foreground, background, bold, !blinking);
+	public SgrString changeBlinking(Boolean blinking) {
+		return new SgrString(base, foreground, background, bold, blinking);
 	}
 }
