@@ -1,5 +1,6 @@
 package display;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,27 +25,46 @@ public class Display {
 	 * @return A mapping of tiles on info's board to how that tile can be
 	 * displayed.
 	 */
-	public static Map<Tile, String> tileToDisplay(GameInfo info) {
-		Map<Tile, String> tileToDisplay = new HashMap<>();
+	public static Map<Tile, SgrString> tileToDisplay(GameInfo info) {
+		Map<Tile, SgrString> tileToDisplay = new HashMap<>();
 
 		for(Tile tile : info.board().tiles()) {
-			String displayForTile;
+			SgrString displayForTile;
+
+			Color tileColor;
 			//Sets the background of the display to match the color of the tile
 			if(isTileWhite(tile)) {
-				displayForTile = "\u001b[48;2;140;145;155m";
+				tileColor = new Color(140,145,155);
 			}
 			else {
-				displayForTile = "\u001b[48;2;80;90;105m";
+				tileColor = new Color(80,90,105);
 			}
 
 			//Adds the piece on the current tile (if one exists) to its display
 			Integer pieceOnTile = info.board().pieceOnTile(tile);
 			if(pieceOnTile != null) {
-				displayForTile += displayForPiece(info, pieceOnTile);
+				/**
+				 * Gets the unicode character to represent the piece on the
+				 * current tile.
+				 */
+				String pieceDisplay = displayForPieceType(
+					info.pieceToInfo().get(pieceOnTile).type()
+				);
+				Color pieceColor = pieceColor(info, pieceOnTile);
+				/**
+				 * Creates an SGR string with a unicode character that matches
+				 * the piece on the current tile for the base, the color of
+				 * that piece for the foreground, and color of the current tile
+				 * for the background, creating the effect of having a piece
+				 * on a Tile.
+				 */
+				displayForTile = new SgrString(
+					pieceDisplay + " ", pieceColor, tileColor
+				);
 			}
 			else {
 				//An empty space if no piece exists on tile
-				displayForTile += ' '; 
+				displayForTile = new SgrString("  ", null, tileColor); 
 			}
 
 			tileToDisplay.put(tile, displayForTile);
@@ -86,12 +106,7 @@ public class Display {
 	 * info describes.
 	 * @return The display that represents piece.
 	 */
-	private static String displayForPiece(GameInfo info, Integer piece) {
-		String displayForPiece;
-
-		PieceType type = info.pieceToInfo().get(piece).type();
-		displayForPiece = "" + displayForPieceType(type);
-
+	private static Color pieceColor(GameInfo info, Integer piece) {
 		Integer whitePlayer = info.order().firstPlayer();
 		Integer blackPlayer = info.order().secondPlayer();
 		//Makes the piece white if it belongs to a white player.
@@ -99,7 +114,7 @@ public class Display {
 			info.playerToInfo().get(whitePlayer)
 			.pieces().contains(piece)
 		) {
-			displayForPiece = "\u001b[38;2;255;255;255m" + displayForPiece;
+			return Color.WHITE;
 		}
 
 		//Makes the piece black if it belongs to a black player.
@@ -107,7 +122,7 @@ public class Display {
 			info.playerToInfo().get(blackPlayer)
 			.pieces().contains(piece)
 		) {
-			displayForPiece = "\u001b[38;2;0;0;0m" + displayForPiece;
+			return Color.BLACK;
 		}
 		//Throws an error if nobody owns the piece.
 		else {
@@ -115,8 +130,6 @@ public class Display {
 				"piece isn't owned by a player."
 			);
 		}
-
-		return displayForPiece;
 	}
 
 
@@ -124,12 +137,12 @@ public class Display {
 	 * @param type
 	 * @return The unicode character that represents this type of piece.
 	 */
-	private static char displayForPieceType(PieceType type) {
-		if(type == PieceType.PAWN) return '\u265F';          //unicode pawn
-		else if(type == PieceType.FERZ) return '\u265D';     //unicode bishop
-		else if(type == PieceType.WAZIR) return '\u265C';    //unicode rook
-		else if(type == PieceType.KNIGHT) return '\u265E';   //unicode knight
-		else if(type == PieceType.COMMANDO) return '\u265A'; //unicode king
+	private static String displayForPieceType(PieceType type) {
+		if(type == PieceType.PAWN) return "\u265F";          //unicode pawn
+		else if(type == PieceType.FERZ) return "\u265D";     //unicode bishop
+		else if(type == PieceType.WAZIR) return "\u265C";    //unicode rook
+		else if(type == PieceType.KNIGHT) return "\u265E";   //unicode knight
+		else if(type == PieceType.COMMANDO) return "\u265A"; //unicode king
 		else {
 			throw new IllegalArgumentException(
 				"piece is of an unsupported PieceType."
