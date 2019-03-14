@@ -147,12 +147,18 @@ public final class SgrString {
 
 
 	public SgrString changeBase(String base) {
-		return new SgrString(base, foreground, background, bold, blinking);
+		if(this.base.equals(base)) {
+			return new SgrString(base, foreground, background, bold, blinking);
+		}
+		return this;
 	}
 
 
 	public SgrString changeForeground(Color foreground) {
-		return new SgrString(base, foreground, background, bold, blinking);
+		if(this.foreground.equals(foreground)) {
+			return new SgrString(base, foreground, background, bold, blinking);
+		}
+		return this;
 	}
 
 
@@ -162,7 +168,10 @@ public final class SgrString {
 
 
 	public SgrString changeBackground(Color background) {
-		return new SgrString(base, foreground, background, bold, blinking);
+		if(this.background.equals(background)) {
+			return new SgrString(base, foreground, background, bold, blinking);
+		}
+		return this;
 	}
 
 
@@ -172,11 +181,17 @@ public final class SgrString {
 
 
 	public SgrString changeBold(Boolean bold) {
-		return new SgrString(base, foreground, background, bold, blinking);
+		if(this.bold.equals(bold)) {
+			return new SgrString(base, foreground, background, bold, blinking);
+		}
+		return this;
 	}
 
 
 	public SgrString changeBlinking(Boolean blinking) {
-		return new SgrString(base, foreground, background, bold, blinking);
+		if(this.blinking.equals(blinking)) {
+			return new SgrString(base, foreground, background, bold, blinking);
+		}
+		return this;
 	}
 }
