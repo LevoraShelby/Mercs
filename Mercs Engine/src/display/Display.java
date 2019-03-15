@@ -44,6 +44,11 @@ public class Display {
 			line += tileToDisplay.get(tile);
 			boardDisplay.set(i, line);
 		}
+
+		/**
+		 * Stops the last tile of each rank from bleeding it's color for the
+		 * rest of its line.
+		 */
 		boardDisplay.replaceAll((line) -> line += "\u001b[m");
 
 		return boardDisplay.toArray(new String[boardDisplay.size()]);
@@ -136,6 +141,37 @@ public class Display {
 		boolean isTileOnEvenRank = tile.rank() % 2 == 0;
 		boolean isTileOnEvenFile = tile.file() % 2 == 0;
 		return isTileOnEvenRank ^ isTileOnEvenFile;
+	}
+
+
+	/**
+	 * @param display1 The display on the left.
+	 * @param display2 The display on the right.
+	 * @return Combines two displays so that they print side-by-side.
+	 */
+	public static String[] combinedDisplay(
+		String[] display1, String[] display2
+	) {
+		int length = display1.length > display2.length ? 
+			display1.length : display2.length;
+		String[] combinedDisplay = new String[length];
+
+		for(int i = 0; i < combinedDisplay.length; i++) {
+			combinedDisplay[i] = "";
+			if(i < display1.length) {
+				combinedDisplay[i] += display1[i];
+			}
+			else if(i >= display1.length) {
+				combinedDisplay[i] += "     ";
+			}
+			combinedDisplay[i] += "     ";
+
+			if(i < display2.length) {
+				combinedDisplay[i] += display2[i];
+			}
+		}
+
+		return combinedDisplay;
 	}
 
 
