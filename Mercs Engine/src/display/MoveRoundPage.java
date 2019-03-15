@@ -19,7 +19,7 @@ public class MoveRoundPage {
 
 		String[] display = Display.defaultBoardDisplay(info);
 		for(String line : display) {
-			System.out.println(line + "\u001b[m");
+			System.out.println(line);
 		}
 	}
 
@@ -36,12 +36,15 @@ public class MoveRoundPage {
 			if(input.equals("q")) {
 				System.exit(1);
 			}
+
 			else if(input.matches("[a-f][1-6]")) {
 				Tile selectedTile = toTile(input);
 				Integer tempSelectedPiece = info.board()
 					.pieceOnTile(selectedTile);
+
 				if(tempSelectedPiece != null) {
 					Integer currentPlayer = info.order().turn().currentPlayer();
+
 					if(
 						info.playerToInfo().get(currentPlayer)
 						.pieces().contains(tempSelectedPiece)
@@ -50,6 +53,7 @@ public class MoveRoundPage {
 						movementView = movementView.select(tempSelectedPiece);
 					}
 				}
+
 				else if(selectedPiece != null) {
 					Move[][] plays = info.pieceToInfo()
 							.get(selectedPiece)
@@ -60,6 +64,7 @@ public class MoveRoundPage {
 					}
 				}
 			}
+
 			else {
 				selectedPiece = null;
 				movementView = movementView.select(selectedPiece);

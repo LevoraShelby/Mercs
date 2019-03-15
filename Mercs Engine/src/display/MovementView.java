@@ -34,7 +34,7 @@ public class MovementView {
 		 */
 		String[] display = Display.boardDisplay(tileToDisplay);
 		for(int i = 0; i < display.length; i++) {
-			display[i] = display[i] + "\u001b[m";
+			display[i] = display[i];
 		}
 		return display;
 	}

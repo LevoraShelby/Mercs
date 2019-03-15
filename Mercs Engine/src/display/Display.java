@@ -44,6 +44,7 @@ public class Display {
 			line += tileToDisplay.get(tile);
 			boardDisplay.set(i, line);
 		}
+		boardDisplay.replaceAll((line) -> line += "\u001b[m");
 
 		return boardDisplay.toArray(new String[boardDisplay.size()]);
 	}
