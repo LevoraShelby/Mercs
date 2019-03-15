@@ -51,7 +51,7 @@ public class MovementView {
 			 */
 			Tile tile = play[play.length - 1].newPosition();
 			SgrString display = tileToDisplay.get(tile);
-			
+
 			display = display.changeBackground(display.background().darker());
 			tileToDisplay.put(tile, display);
 		}

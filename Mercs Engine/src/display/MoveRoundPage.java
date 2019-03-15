@@ -17,12 +17,10 @@ public class MoveRoundPage {
 		Scanner in = new Scanner(System.in);
 		info = load(info, in);
 
-		String display = BoardDisplay.gameToString(
-			info.board().tiles(),
-			BoardDisplay.tileToDisplay(info),
-			"X"
-		);
-		System.out.println(display);
+		String[] display = Display.boardDisplay(Display.tileToDisplay(info));
+		for(String line : display) {
+			System.out.println(line + "\u001b[m");
+		}
 	}
 
 

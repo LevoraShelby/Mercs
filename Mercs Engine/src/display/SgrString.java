@@ -15,8 +15,8 @@ public final class SgrString {
 	private final String base;
 	private final Color foreground;
 	private final Color background;
-	private final Boolean bold;
-	private final Boolean blinking;
+	private final boolean bold;
+	private final boolean blinking;
 
 
 	/**
@@ -25,15 +25,13 @@ public final class SgrString {
 	 * base text is not changed.
 	 * @param background The color behind the base text. If null, the color 
 	 * behind the base text is not changed.
-	 * @param bold Whether or not the base text will be bold. If null, the
-	 * bold effect is not changed.
-	 * @param blinking Whether or not the base text will be blinking. If
-	 * null, the blinking effect is not changed.
+	 * @param bold Whether or not the base text will be bold.
+	 * @param blinking Whether or not the base text will be blinking.
 	 */
 	public SgrString(
 		String base,
 		Color foreground, Color background, 
-		Boolean bold, Boolean blinking
+		boolean bold, boolean blinking
 	) {
 		this.base = base;
 		this.foreground = foreground;
@@ -50,7 +48,7 @@ public final class SgrString {
 	 * @param background
 	 */
 	public SgrString(String base, Color foreground, Color background) {
-		this(base, foreground, background, null, null);
+		this(base, foreground, background, false, false);
 	}
 
 
@@ -70,29 +68,24 @@ public final class SgrString {
 	public String toString() {
 		final String CSI = "\u001b[";
 
-		String toString = "";
+		String toString = base;
 		if(foreground != null) {
-			toString += CSI + "38;2;" + sgrArgsForColor(foreground) + "m";
+			toString = CSI + "38;2;" + sgrArgsForColor(foreground) + "m" + 
+				toString;
 		}
 		if(background != null) {
-			toString += CSI + "48;2;" + sgrArgsForColor(background) + "m";
+			toString = CSI + "48;2;" + sgrArgsForColor(background) + "m" +
+				toString;
 		}
 
-		if(bold != null && bold) {
-			toString += CSI + "1m";
-		}
-		else if(bold != null && !bold) {
-			toString += CSI + "21m";
+		if(bold) {
+			toString = CSI + "1m" + toString + CSI + "21m";
 		}
 
-		if(blinking != null && blinking) {
-			toString += CSI + "5m";
-		}
-		else if(blinking != null && !blinking) {
-			toString += CSI + "25m";
+		if(blinking) {
+			toString = CSI + "5m" + toString + CSI + "25m";
 		}
 
-		toString += base;
 		return toString;
 	}
 
@@ -173,7 +166,7 @@ public final class SgrString {
 
 
 	public SgrString changeForeground(Color foreground) {
-		if(this.foreground == null || this.foreground.equals(foreground)) {
+		if(this.foreground == null || !this.foreground.equals(foreground)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -186,7 +179,7 @@ public final class SgrString {
 
 
 	public SgrString changeBackground(Color background) {
-		if(this.background == null || this.background.equals(background)) {
+		if(this.background == null || !this.background.equals(background)) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -198,8 +191,8 @@ public final class SgrString {
 	}
 
 
-	public SgrString changeBold(Boolean bold) {
-		if(this.bold == null || this.bold.equals(bold)) {
+	public SgrString changeBold(boolean bold) {
+		if(this.bold != bold) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
@@ -207,7 +200,7 @@ public final class SgrString {
 
 
 	public SgrString changeBlinking(Boolean blinking) {
-		if(this.blinking == null || this.blinking.equals(blinking)) {
+		if(this.blinking != blinking) {
 			return new SgrString(base, foreground, background, bold, blinking);
 		}
 		return this;
