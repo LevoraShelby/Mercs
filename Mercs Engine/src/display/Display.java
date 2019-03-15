@@ -51,6 +51,15 @@ public class Display {
 
 	/**
 	 * @param info A game of Mercs.
+	 * @return A board display for a game of Mercs.
+	 */
+	public static String[] defaultBoardDisplay(GameInfo info) {
+		return boardDisplay(tileToDisplay(info));
+	}
+
+
+	/**
+	 * @param info A game of Mercs.
 	 * @return A mapping of tiles on info's board to how that tile can be
 	 * displayed.
 	 */

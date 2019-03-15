@@ -17,7 +17,7 @@ public class MoveRoundPage {
 		Scanner in = new Scanner(System.in);
 		info = load(info, in);
 
-		String[] display = Display.boardDisplay(Display.tileToDisplay(info));
+		String[] display = Display.defaultBoardDisplay(info);
 		for(String line : display) {
 			System.out.println(line + "\u001b[m");
 		}
