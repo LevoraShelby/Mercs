@@ -1,222 +1,231 @@
 package mercs;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import main.Board;
 import main.Move;
-import main.MoveLogic;
 import main.RecordBasedMoveLogic;
 import mercs.info.GameInfo;
-import mercs.info.OrderInfo;
 import mercs.info.PieceInfo;
 import mercs.info.PlayerInfo;
+import mercs.info.OrderInfo;
 
 
 
 /**
- * This represents the options available to the current player in a round of 
- * movement in a game of Mercs.
+ * Represents the available options for a round of movement for the current
+ * player in a game of Mercs. The current player is able to look at the plays
+ * that each of their pieces that are currently on the board can make. They can
+ * also choose one of these pieces to make a specified play.
  * @author trevor
  */
-public class MoveRound {
+public final class MoveRound {
 	private final GameInfo info;
 
 
 	/**
-	 * @param info The description for the game of this round. The order for
-	 * info must have a PlayState of MOVE. (non-null)
+	 * @param info A game of Mercs that is currently in its move round.
 	 */
 	public MoveRound(GameInfo info) {
-		handleExceptions(info);
+		if(info.order().turn().playState() != PlayState.MOVE) {
+			throw new IllegalArgumentException(
+				"info does not describe a game of Mercs in its move round."
+			);
+		}
 		this.info = info;
 	}
 
 
 	/**
-	 * @return The different plays that the current player can make, given
-	 * the pieces they control.
+	 * @return A mapping of each piece of the current player's that could make
+	 * a play to all the plays that the piece could make.
 	 */
 	public Map<Integer, Move[][]> pieceToPlays() {
-		//Gets the current player's pieces
-		Integer currentPlayer = info.order().turn().currentPlayer();
-		Set<Integer> currentPlayerPieces = 
-			info.playerToInfo().get(currentPlayer).pieces();
+		/**
+		 * Gets the current player's pieces in order to get those pieces'
+		 * plays.
+		 */
+		Set<Integer> piecesOfCurrentPlayer = info
+			.playerToInfo()
+			.get(info.order().turn().currentPlayer())
+			.pieces();
 
 		/**
-		 * Using the current player's pieces, builds a pieceToPlays map using
-		 * each piece's MoveLogic.
+		 * Removes every piece of the current player's that isn't on the board,
+		 * since those pieces cannot make plays.
 		 */
-		Map<Integer, Move[][]> pieceToPlays = new HashMap<>();
-		for(Integer piece : currentPlayerPieces) {
-			MoveLogic pieceLogic = info.pieceToInfo().get(piece).logic();
-			pieceToPlays.put(piece, pieceLogic.plays());
+		Iterator<Integer> piecesIter = piecesOfCurrentPlayer.iterator();
+		while(piecesIter.hasNext()) {
+			if(info.board().tileForPiece(piecesIter.next()) == null) {
+				piecesIter.remove();
+			}
 		}
 
+		//Gets the plays for each piece and maps them to that piece.
+		Map<Integer, Move[][]> pieceToPlays = new HashMap<>();
+		for(Integer piece : piecesOfCurrentPlayer) {
+			Move[][] playsForPiece = info
+				.pieceToInfo().get(piece)
+				.logic().plays();
+			pieceToPlays.put(piece, playsForPiece);
+		}
 		return pieceToPlays;
 	}
 
 
 	/**
-	 * @param piece The piece that the current player is calling upon for this
-	 * play.
-	 * @param playIndex The index for the play from piece's available plays.
-	 * @return The result of the game this round belongs to, after having
-	 * performed the described play.
+	 * @param piece A piece of the current player's that is on the board.
+	 * @param playIndex An index that points to a play in the array of plays
+	 * that the given piece can make.
+	 * @return The game of Mercs after the current player decides to make the
+	 * given play.
 	 */
 	public GameInfo play(Integer piece, int playIndex) {
 		Move[] play = pieceToPlays().get(piece)[playIndex];
-		Board newBoard = boardAfterPlay(play);
 
-		PlayerInfo newCurrentPlayerInfo = currentPlayerInfoAfterPlay(play);
-		Map<Integer, PlayerInfo> newPlayerToInfo = info.playerToInfo();
-		newPlayerToInfo.put(
-			info.order().turn().currentPlayer(),
-			newCurrentPlayerInfo
-		);
+		Board board = newBoard(play);
+		Map<Integer, PieceInfo> pieceToInfo = newPieceToInfo(board, play);
+		Map<Integer, PlayerInfo> playerToInfo = newPlayerToInfo(play);
+		OrderInfo order = nextOrder();
 
-		Map<Integer, PieceInfo> newPieceToInfo = pieceToInfoAfterPlay(play);
-
-		Map<Integer, Integer> playerToCooldown = new HashMap<>();
-		for(Integer player : info.playerToInfo().keySet()) {
-			int cooldown = info.playerToInfo().get(player).cooldown();
-			playerToCooldown.put(player, cooldown);
-		}
-		TurnSequencer sequencer = new TurnSequencer(
-			info.order(),
-			playerToCooldown
-		);
-		OrderInfo newOrder = new OrderInfo(
-			sequencer.next(),
-			info.order().firstPlayer(),
-			info.order().secondPlayer()
-		);
-
-		return new GameInfo(
-			newBoard, newPieceToInfo, newPlayerToInfo, newOrder
-		);
+		return new GameInfo(board, pieceToInfo, playerToInfo, order);
 	}
 
 
 	/**
-	 * @param play The play being performed.
-	 * @return The resultant Board if play were performed.
+	 * @param play A play being made on the board.
+	 * @return The board after the given play is made on it.
 	 */
-	private Board boardAfterPlay(Move[] play) {
-		Board newBoard = info.board();
+	private Board newBoard(Move[] play) {
+		Board board = info.board();
 		for(Move move : play) {
-			newBoard = newBoard.makeMove(move);
+			board = board.makeMove(move);
 		}
-		return newBoard;
+		return board;
 	}
 
 
 	/**
-	 * @param play The play being performed.
-	 * @return The number of pieces that do not belong to the current player.
-	 * that would be moved from on the board to off the board if play were
-	 * performed.
+	 * @param board The board that the given play creates from the previous
+	 * board when that play is made.
+	 * @param play A play being made that could affect the pieces in the game.
+	 * @return A mapping of each piece to it's information after play is made.
 	 */
-	private int numPiecesCapturedInPlay(Move[] play) {
-		int numPiecesCapturedInPlay = 0;
-
-		Board newBoard = info.board();
-
-		Integer currentPlayer = info.order().turn().currentPlayer();
-		PlayerInfo currentPlayerInfo = info.playerToInfo().get(currentPlayer);
-		for(Move move : play) {
-			/**
-			 * Checks if piece that does not belong to the current player is 
-			 * being moved from the board to off of it. This is what
-			 * constitutes as a "capture".
-			 */
-			if(
-				move.newPosition() == null 
-				&& newBoard.tileForPiece(move.piece()) != null
-				&& !currentPlayerInfo.pieces().contains(move.piece())
-			) {
-				numPiecesCapturedInPlay++;
-			}
-			newBoard = newBoard.makeMove(move);
-		}
-
-		return numPiecesCapturedInPlay;
-	}
-
-
-	/**
-	 * @param play The play being performed.
-	 * @return What the current player's information would be if play were
-	 * performed.
-	 */
-	private PlayerInfo currentPlayerInfoAfterPlay(Move[] play) {
-		int numPiecesCapturedInPlay = numPiecesCapturedInPlay(play);
-		Integer currentPlayer = info.order().turn().currentPlayer();
-		PlayerInfo currentPlayerInfoBeforePlay = 
-			info.playerToInfo().get(currentPlayer);
-		int cooldown = currentPlayerInfoBeforePlay.cooldown();
-		if(cooldown > 0) cooldown--;
-
-		return new PlayerInfo(
-			currentPlayerInfoBeforePlay.pieces(),
-			currentPlayerInfoBeforePlay.numPiecesCaptured() 
-				+ numPiecesCapturedInPlay,
-			cooldown
-		);
-	}
-
-
-	/**
-	 * @param play The play being performed.
-	 * @return What the information for every piece would be if play were
-	 * performed.
-	 */
-	private Map<Integer, PieceInfo> pieceToInfoAfterPlay(Move[] play) {
-		//Gets the logic that needs to be updated for each piece.
-		Map<Integer, RecordBasedMoveLogic> pieceToLogic = new HashMap<>();
+	private Map<Integer, PieceInfo> newPieceToInfo(Board board, Move[] play) {
+		/**
+		 * Maps each piece to its information, changing its logic to an updated
+		 * version.
+		 */
+		Map<Integer, PieceInfo> pieceToInfo = new HashMap<>();
 		for(Integer piece : info.pieceToInfo().keySet()) {
-			pieceToLogic.put(piece, info.pieceToInfo().get(piece).logic());
-		}
-		//Uses an UpdatingPlayMaker to handle the update.
-		Map<Integer, RecordBasedMoveLogic> pieceToLogicAfterPlay = 
-			new UpdatingPlayMaker(
-					info.board(), 
-					pieceToLogic
-			).update(boardAfterPlay(play), play);
-
-		//Creates an updated version of each piece, based on play.
-		Map<Integer, PieceInfo> pieceToInfoAfterPlay = new HashMap<>();
-		for(Integer piece : pieceToLogicAfterPlay.keySet()) {
+			//Reuses the type for each piece.
 			PieceType type = info.pieceToInfo().get(piece).type();
-			//Creates the updated piece with it's same type and new logic.
-			pieceToInfoAfterPlay.put(
-				piece,
-				new PieceInfo(
-					type,
-					pieceToLogicAfterPlay.get(piece)
-				)
-			);
+
+			//Updates the logic for each piece.
+			RecordBasedMoveLogic logic = info
+				.pieceToInfo().get(piece)
+				.logic().update(board, play);
+
+			PieceInfo pieceInfo = new PieceInfo(type, logic);
+			pieceToInfo.put(piece, pieceInfo);
 		}
 
-		return pieceToInfoAfterPlay;
+		return pieceToInfo;
 	}
 
 
 	/**
-	 * Throws exceptions if any of the arguments aren't allowed for the
-	 * constructor.
+	 * @param play A play being made (by the current player) that could affect
+	 * the total number of pieces that the current player has captured.
+	 * @return A mapping of each player to their information after play is
+	 * made.
 	 */
-	private static void handleExceptions(GameInfo info) {
-		if(info == null) {
-			throw new NullPointerException(
-				"info is null: There isn't a game for this round to belong to."
-			);
+	private Map<Integer, PlayerInfo> newPlayerToInfo(Move[] play) {
+		Map<Integer, PlayerInfo> playerToInfo = info.playerToInfo();
+		Integer currentPlayer = info.order().turn().currentPlayer();
+
+		/**
+		 * Calculates the number of pieces that the current player captured
+		 * during the play. For a piece to be "captured" by a player, it has to
+		 * be taken off the board and the piece being taken off cannot belong
+		 * to that player.
+		 */
+		int numPiecesCapturedDuringPlay = 0;
+		for(Move move : play) {
+			if(
+				move.newPosition() == null
+				&& !info
+					.playerToInfo().get(currentPlayer)
+					.pieces().contains(move.piece())
+			) {
+				numPiecesCapturedDuringPlay++;
+			}
 		}
-		if(info.order().turn().playState() != PlayState.MOVE) {
+
+		//Adds the pieces that current player captured to their total.
+		PlayerInfo currentPlayerInfo = info.playerToInfo().get(currentPlayer);
+		currentPlayerInfo = new PlayerInfo(
+			currentPlayerInfo.pieces(),
+			currentPlayerInfo.numPiecesCaptured()
+				+ numPiecesCapturedDuringPlay,
+			currentPlayerInfo.cooldown()
+		);
+
+		playerToInfo.put(currentPlayer, currentPlayerInfo);
+		return playerToInfo;
+	}
+
+
+	/**
+	 * @return The order for this game of Mercs after a play is made.
+	 */
+	private OrderInfo nextOrder() {
+		TurnState turn;
+
+		Integer currentPlayer = info.order().turn().currentPlayer();
+		//If the current player has no cooldown, it becomes their turn to buy.
+		if(info.playerToInfo().get(currentPlayer).cooldown() == 0) {
+			turn = new TurnState(currentPlayer, PlayState.BUY);
+		}
+		/**
+		 * If the current player has cooldown, it becomes the next player's
+		 * turn to move.
+		 */
+		else {
+			turn = new TurnState(otherPlayer(currentPlayer), PlayState.MOVE);
+		}
+
+		OrderInfo order = new OrderInfo(
+			turn,
+			info.order().firstPlayer(), info.order().secondPlayer()
+		);
+		return order;
+	}
+
+
+	/**
+	 * @param player
+	 * @return The other player in the game.
+	 */
+	private Integer otherPlayer(Integer player) {
+		//Returns the second player if the given player is the first player.
+		if(info.order().firstPlayer() == player) {
+			return info.order().secondPlayer();
+		}
+		//Returns the first player if the given player is the second player.
+		else if(info.order().secondPlayer() == player) {
+			return info.order().firstPlayer();
+		}
+		/**
+		 * Throws an exception if the given player is neither the first or
+		 * second player.
+		 */
+		else {
 			throw new IllegalArgumentException(
-				"playState of info isn't MOVE: MoveRound can't occur when its "
-				+ "game isn't in a MOVE playState."
+				"player is not the first or second player."
 			);
 		}
 	}
