@@ -1,6 +1,5 @@
 package mercs.info;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,8 @@ import main.Board;
 public class GameInfo {
 	private final Board board;
 	private final Map<Integer, PieceInfo> pieceToInfo;
-	private final Map<Integer, PlayerInfo> playerToInfo;
+	private final PlayerInfo firstPlayerInfo;
+	private final PlayerInfo secondPlayerInfo;
 	private final OrderInfo order;
 
 
@@ -38,14 +38,17 @@ public class GameInfo {
 	public GameInfo(
 		Board board,
 		Map<Integer, PieceInfo> pieceToInfo,
-		Map<Integer, PlayerInfo> playerToInfo,
+		PlayerInfo firstPlayerInfo, PlayerInfo secondPlayerInfo,
 		OrderInfo order
 	) {
-		handleExceptions(board, pieceToInfo, playerToInfo, order);
+		handleExceptions(
+			board, pieceToInfo, firstPlayerInfo, secondPlayerInfo, order
+		);
 
 		this.board = board;
 		this.pieceToInfo = new HashMap<Integer, PieceInfo>(pieceToInfo);
-		this.playerToInfo = new HashMap<Integer, PlayerInfo>(playerToInfo);
+		this.firstPlayerInfo = firstPlayerInfo;
+		this.secondPlayerInfo = secondPlayerInfo;
 		this.order = order;
 	}
 
@@ -68,16 +71,36 @@ public class GameInfo {
 
 
 	/**
-	 * @return A mapping for each player to the information that describes it
-	 * in this game.
+	 * @return A description of the first player.
 	 */
-	public Map<Integer, PlayerInfo> playerToInfo() {
-		return new HashMap<Integer, PlayerInfo>(playerToInfo);
+	public PlayerInfo firstPlayerInfo() {
+		return firstPlayerInfo;
 	}
 
 
 	/**
-	 * @return 
+	 * @return A description of the second player.
+	 */
+	public PlayerInfo secondPlayerInfo() {
+		return secondPlayerInfo;
+	}
+
+
+	/**
+	 * @return A description of the current player.
+	 */
+	public PlayerInfo currentPlayerInfo() {
+		if(order.isFirstPlayersTurn()) {
+			return firstPlayerInfo;
+		}
+		else {
+			return secondPlayerInfo;
+		}
+	}
+
+
+	/**
+	 * @return The order of this game.
 	 */
 	public OrderInfo order() {
 		return order;
@@ -91,121 +114,104 @@ public class GameInfo {
 	private static void handleExceptions(
 		Board board,
 		Map<Integer, PieceInfo> pieceToInfo,
-		Map<Integer, PlayerInfo> playerToInfo,
+		PlayerInfo firstPlayerInfo, PlayerInfo secondPlayerInfo,
 		OrderInfo order
 	) {
 		if(board == null) {
 			throw new NullPointerException(
-				"board is null: There isn't a board to play on."
+				"board is null."
 			);
 		}
 		if(pieceToInfo == null) {
 			throw new NullPointerException(
-				"pieceToInfo is null: There isn't a set of pieces to play "
-				+ "with."
+				"pieceToInfo is null."
 			);
 		}
 		if(pieceToInfo.containsKey(null)) {
 			throw new NullPointerException(
-				"pieceToInfo contains a null key: This game has a piece that "
-				+ "doesn't exist."
+				"pieceToInfo contains a null key."
 			);
 		}
 		if(pieceToInfo.containsValue(null)) {
 			throw new NullPointerException(
-				"pieceToInfo contains a null value: There exists a piece that "
-				+ "can't be described."
+				"pieceToInfo contains a null value."
 			);
 		}
-		if(!pieceToInfo.keySet().containsAll(board.pieces())) {
-			throw new IllegalArgumentException(
-				"board has pieces that pieceToInfo does not: The board holds "
-				+ "pieces that this game cannot describe."
-			);
+		//Checks that the board has no undescribed pieces.
+		for(Integer piece : board.pieces()) {
+			if(!pieceToInfo.containsKey(piece)) {
+				throw new IllegalArgumentException(
+					"board contains the piece " + piece + ", but " +
+					"pieceToInfo does not."
+				);
+			}
 		}
-		/**
-		 * Note: pieceToInfo can describe pieces that aren't on or off the
-		 * board. They're still in the game, it's just that the board doesn't
-		 * hold them. The board having pieces that pieceToInfo does not have is
-		 * a problem, because then you have pieces that *are* in the game (they
-		 * have to be -- they're on the board), but can't be described, which
-		 * is something that GameInfo should be able to do for every piece it
-		 * has.
-		 */
-		if(playerToInfo == null) {
+		//Checks that non-existent pieces are not being described.
+		for(Integer piece : pieceToInfo.keySet()) {
+			if(!board.pieces().contains(piece)) {
+				throw new IllegalArgumentException(
+					"pieceToInfo contains the piece " + piece + ", but " +
+					"board does not."
+				);
+			}
+		}
+		if(firstPlayerInfo == null) {
 			throw new NullPointerException(
-				"playerToInfo is null: There isn't a group of players to play "
-				+ "this game."
+				"firstPlayerInfo is null."
 			);
 		}
-		if(playerToInfo.containsKey(null)) {
+		if(secondPlayerInfo == null) {
 			throw new NullPointerException(
-				"playerToInfo contains a null key: This game has a player "
-				+ "that doesn't exist."
+				"secondPlayerInfo is null."
 			);
 		}
-		if(playerToInfo.containsValue(null)) {
-			throw new NullPointerException(
-				"playerToInfo contains a null value: There exists a player "
-				+ "that can't be described."
-			);
+		for(Integer piece : board.pieces()) {
+			if(
+				!firstPlayerInfo.pieces().contains(piece)
+				&& !secondPlayerInfo.pieces().contains(piece)
+			) {
+				throw new IllegalArgumentException(
+					"board contains the piece " + piece + ", but neither " +
+					"player has it."
+				);
+			}
 		}
-		Integer pieceOwnedOutOfGame = pieceOwnedOutOfGame(
-			pieceToInfo.keySet(), playerToInfo.values()
-		);
-		if(pieceOwnedOutOfGame != null) {
-			throw new IllegalArgumentException(
-				"playerToInfo describes a player who owns a piece that "
-				+ "pieceToInfo does not contain: There exists a player that "
-				+ "that owns a piece that does not exist in this game."
-			);
+		for(Integer piece : firstPlayerInfo.pieces()) {
+			if(secondPlayerInfo.pieces().contains(piece)) {
+				throw new IllegalArgumentException(
+					"Both players have the piece " + piece + "."
+				);
+			}
+		}
+		for(Integer piece : firstPlayerInfo.pieces()) {
+			if(!board.pieces().contains(piece)) {
+				throw new IllegalArgumentException(
+					"firstPlayerInfo contains the piece " + ", but the " +
+					"board does not."
+				);
+			}
+		}
+		for(Integer piece : secondPlayerInfo.pieces()) {
+			if(!board.pieces().contains(piece)) {
+				throw new IllegalArgumentException(
+					"secondPlayerInfo contains the piece " + ", but the " + 
+					"board does not."
+				);
+			}
 		}
 		if(order == null) {
 			throw new NullPointerException(
-				"order is null: This game has no order to play by."
+				"order is null."
 			);
 		}
-		if(!playerToInfo.keySet().containsAll(order.turnOrder())) {
-			throw new IllegalArgumentException(
-				"playerToInfo is missing players from order: Players that are "
-				+ "playing this game can't be described by it."
-			);
-		}
-	}
-
-
-	/**
-	 * Finds a piece that a player owns that isn't a piece in the game.
-	 * @param piecesInGame all of the pieces in the game.
-	 * @param infoOfPlayers information for all of the players in the game.
-	 * @return a piece. If all the players' pieces exist in the game, this
-	 * method returns null.
-	 */
-	private static Integer pieceOwnedOutOfGame(
-		Collection<Integer> piecesInGame,
-		Collection<PlayerInfo> infoOfPlayers
-	) {
-		/**
-		 * Goes through each piece of each player, checking that each piece is
-		 * being held in piecesInGame as well. If a piece isn't being held in
-		 * piecesInGame, that piece is returned.
-		 */
-		for(PlayerInfo playerInfo : infoOfPlayers) {
-			for(Integer ownedPiece : playerInfo.pieces()) {
-				if(!piecesInGame.contains(ownedPiece)) {
-					return ownedPiece;
-				}
-			}
-		}
-
-		return null;
 	}
 
 
 	public String toString() {
 		String toString = "{board: " + board + ", pieceToInfo: " + pieceToInfo;
-		toString += ", playerToInfo" + playerToInfo + ", order: " + order;
-		toString += "}";
+		toString += ", firstPlayerInfo:" + firstPlayerInfo;
+		toString += ", secondPlayerInfo: " + secondPlayerInfo +  ", order: ";
+		toString += order + "}";
 		return toString;
 	}
 }
