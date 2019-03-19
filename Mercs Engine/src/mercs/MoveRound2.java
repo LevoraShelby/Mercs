@@ -11,6 +11,7 @@ import main.RecordBasedMoveLogic;
 import mercs.info.GameInfo;
 import mercs.info.PieceInfo;
 import mercs.info.PlayerInfo;
+import mercs.info.OrderInfo;
 
 
 
@@ -88,6 +89,9 @@ public final class MoveRound2 {
 		Board board = newBoard(play);
 		Map<Integer, PieceInfo> pieceToInfo = newPieceToInfo(play);
 		Map<Integer, PlayerInfo> playerToInfo = newPlayerToInfo(play);
+		OrderInfo order = nextOrder();
+
+		return new GameInfo(board, pieceToInfo, playerToInfo, order);
 	}
 
 
@@ -170,5 +174,57 @@ public final class MoveRound2 {
 
 		playerToInfo.put(currentPlayer, currentPlayerInfo);
 		return playerToInfo;
+	}
+
+
+	/**
+	 * @return The order for this game of Mercs after a play is made.
+	 */
+	private OrderInfo nextOrder() {
+		TurnState turn;
+
+		Integer currentPlayer = info.order().turn().currentPlayer();
+		//If the current player has no cooldown, it becomes their turn to buy.
+		if(info.playerToInfo().get(currentPlayer).cooldown() == 0) {
+			turn = new TurnState(currentPlayer, PlayState.BUY);
+		}
+		/**
+		 * If the current player has cooldown, it becomes the next player's
+		 * turn to move.
+		 */
+		else {
+			turn = new TurnState(otherPlayer(currentPlayer), PlayState.MOVE);
+		}
+
+		OrderInfo order = new OrderInfo(
+			turn,
+			info.order().firstPlayer(), info.order().secondPlayer()
+		);
+		return order;
+	}
+
+
+	/**
+	 * @param player
+	 * @return The other player in the game.
+	 */
+	private Integer otherPlayer(Integer player) {
+		//Returns the second player if the given player is the first player.
+		if(info.order().firstPlayer() == player) {
+			return info.order().secondPlayer();
+		}
+		//Returns the first player if the given player is the second player.
+		else if(info.order().secondPlayer() == player) {
+			return info.order().firstPlayer();
+		}
+		/**
+		 * Throws an exception if the given player is neither the first or
+		 * second player.
+		 */
+		else {
+			throw new IllegalArgumentException(
+				"player is not the first or second player."
+			);
+		}
 	}
 }
