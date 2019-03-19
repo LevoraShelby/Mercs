@@ -10,6 +10,7 @@ import main.Move;
 import main.RecordBasedMoveLogic;
 import mercs.info.GameInfo;
 import mercs.info.PieceInfo;
+import mercs.info.PlayerInfo;
 
 
 
@@ -86,6 +87,7 @@ public final class MoveRound2 {
 
 		Board board = newBoard(play);
 		Map<Integer, PieceInfo> pieceToInfo = newPieceToInfo(play);
+		Map<Integer, PlayerInfo> playerToInfo = newPlayerToInfo(play);
 	}
 
 
@@ -104,7 +106,7 @@ public final class MoveRound2 {
 
 	/**
 	 * @param play A play being made that could affect the pieces in the game.
-	 * @return A mapping of each piece to it's updated information.
+	 * @return A mapping of each piece to it's information after play is made.
 	 */
 	private Map<Integer, PieceInfo> newPieceToInfo(Move[] play) {
 		/**
@@ -126,5 +128,47 @@ public final class MoveRound2 {
 		}
 
 		return pieceToInfo;
+	}
+
+
+	/**
+	 * @param play A play being made (by the current player) that could affect
+	 * the total number of pieces that the current player has captured.
+	 * @return A mapping of each player to their information after play is
+	 * made.
+	 */
+	private Map<Integer, PlayerInfo> newPlayerToInfo(Move[] play) {
+		Map<Integer, PlayerInfo> playerToInfo = info.playerToInfo();
+		Integer currentPlayer = info.order().turn().currentPlayer();
+
+		/**
+		 * Calculates the number of pieces that the current player captured
+		 * during the play. For a piece to be "captured" by a player, it has to
+		 * be taken off the board and the piece being taken off cannot belong
+		 * to that player.
+		 */
+		int numPiecesCapturedDuringPlay = 0;
+		for(Move move : play) {
+			if(
+				move.newPosition() == null
+				&& !info
+					.playerToInfo().get(currentPlayer)
+					.pieces().contains(move.piece())
+			) {
+				numPiecesCapturedDuringPlay++;
+			}
+		}
+
+		//Adds the pieces that current player captured to their total.
+		PlayerInfo currentPlayerInfo = info.playerToInfo().get(currentPlayer);
+		currentPlayerInfo = new PlayerInfo(
+			currentPlayerInfo.pieces(),
+			currentPlayerInfo.numPiecesCaptured()
+				+ numPiecesCapturedDuringPlay,
+			currentPlayerInfo.cooldown()
+		);
+
+		playerToInfo.put(currentPlayer, currentPlayerInfo);
+		return playerToInfo;
 	}
 }
