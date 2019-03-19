@@ -68,8 +68,7 @@ public class MoveRound {
 	public GameInfo play(Integer piece, int playIndex) {
 		Move[] play = pieceToPlays().get(piece)[playIndex];
 		Board newBoard = boardAfterPlay(play);
-		
-		//Still not sure if this is just right.
+
 		PlayerInfo newCurrentPlayerInfo = currentPlayerInfoAfterPlay(play);
 		Map<Integer, PlayerInfo> newPlayerToInfo = info.playerToInfo();
 		newPlayerToInfo.put(
