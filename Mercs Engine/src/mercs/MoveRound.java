@@ -30,7 +30,7 @@ public final class MoveRound {
 	 * @param info A game of Mercs that is currently in its move round.
 	 */
 	public MoveRound(GameInfo info) {
-		if(info.order().turn().playState() != PlayState.MOVE) {
+		if(info.order().playState() != PlayState.MOVE) {
 			throw new IllegalArgumentException(
 				"info does not describe a game of Mercs in its move round."
 			);
@@ -48,10 +48,7 @@ public final class MoveRound {
 		 * Gets the current player's pieces in order to get those pieces'
 		 * plays.
 		 */
-		Set<Integer> piecesOfCurrentPlayer = info
-			.playerToInfo()
-			.get(info.order().turn().currentPlayer())
-			.pieces();
+		Set<Integer> piecesOfCurrentPlayer = info.currentPlayerInfo().pieces();
 
 		/**
 		 * Removes every piece of the current player's that isn't on the board,
@@ -88,10 +85,21 @@ public final class MoveRound {
 
 		Board board = newBoard(play);
 		Map<Integer, PieceInfo> pieceToInfo = newPieceToInfo(board, play);
-		Map<Integer, PlayerInfo> playerToInfo = newPlayerToInfo(play);
+
+		PlayerInfo firstPlayerInfo; PlayerInfo secondPlayerInfo;
+		if(info.order().isFirstPlayersTurn()) {
+			firstPlayerInfo = newCurrentPlayerInfo(play);
+			secondPlayerInfo = info.secondPlayerInfo();
+		}
+		else {
+			firstPlayerInfo = info.firstPlayerInfo();
+			secondPlayerInfo = newCurrentPlayerInfo(play);
+		}
 		OrderInfo order = nextOrder();
 
-		return new GameInfo(board, pieceToInfo, playerToInfo, order);
+		return new GameInfo(
+			board, pieceToInfo, firstPlayerInfo, secondPlayerInfo, order
+		);
 	}
 
 
@@ -140,13 +148,9 @@ public final class MoveRound {
 	/**
 	 * @param play A play being made (by the current player) that could affect
 	 * the total number of pieces that the current player has captured.
-	 * @return A mapping of each player to their information after play is
-	 * made.
+	 * @return The current player's information after play is made.
 	 */
-	private Map<Integer, PlayerInfo> newPlayerToInfo(Move[] play) {
-		Map<Integer, PlayerInfo> playerToInfo = info.playerToInfo();
-		Integer currentPlayer = info.order().turn().currentPlayer();
-
+	private PlayerInfo newCurrentPlayerInfo(Move[] play) {
 		/**
 		 * Calculates the number of pieces that the current player captured
 		 * during the play. For a piece to be "captured" by a player, it has to
@@ -157,25 +161,20 @@ public final class MoveRound {
 		for(Move move : play) {
 			if(
 				move.newPosition() == null
-				&& !info
-					.playerToInfo().get(currentPlayer)
-					.pieces().contains(move.piece())
+				&& !info.currentPlayerInfo().pieces().contains(move.piece())
 			) {
 				numPiecesCapturedDuringPlay++;
 			}
 		}
 
 		//Adds the pieces that current player captured to their total.
-		PlayerInfo currentPlayerInfo = info.playerToInfo().get(currentPlayer);
-		currentPlayerInfo = new PlayerInfo(
-			currentPlayerInfo.pieces(),
-			currentPlayerInfo.numPiecesCaptured()
+		PlayerInfo currentPlayerInfo = new PlayerInfo(
+			info.currentPlayerInfo().pieces(),
+			info.currentPlayerInfo().numPiecesCaptured()
 				+ numPiecesCapturedDuringPlay,
-			currentPlayerInfo.cooldown()
+			info.currentPlayerInfo().cooldown()
 		);
-
-		playerToInfo.put(currentPlayer, currentPlayerInfo);
-		return playerToInfo;
+		return currentPlayerInfo;
 	}
 
 
@@ -183,49 +182,19 @@ public final class MoveRound {
 	 * @return The order for this game of Mercs after a play is made.
 	 */
 	private OrderInfo nextOrder() {
-		TurnState turn;
-
-		Integer currentPlayer = info.order().turn().currentPlayer();
 		//If the current player has no cooldown, it becomes their turn to buy.
-		if(info.playerToInfo().get(currentPlayer).cooldown() == 0) {
-			turn = new TurnState(currentPlayer, PlayState.BUY);
+		if(info.currentPlayerInfo().cooldown() == 0) {
+			return new OrderInfo(
+				info.order().isFirstPlayersTurn(), PlayState.BUY
+			);
 		}
 		/**
 		 * If the current player has cooldown, it becomes the next player's
 		 * turn to move.
 		 */
 		else {
-			turn = new TurnState(otherPlayer(currentPlayer), PlayState.MOVE);
-		}
-
-		OrderInfo order = new OrderInfo(
-			turn,
-			info.order().firstPlayer(), info.order().secondPlayer()
-		);
-		return order;
-	}
-
-
-	/**
-	 * @param player
-	 * @return The other player in the game.
-	 */
-	private Integer otherPlayer(Integer player) {
-		//Returns the second player if the given player is the first player.
-		if(info.order().firstPlayer() == player) {
-			return info.order().secondPlayer();
-		}
-		//Returns the first player if the given player is the second player.
-		else if(info.order().secondPlayer() == player) {
-			return info.order().firstPlayer();
-		}
-		/**
-		 * Throws an exception if the given player is neither the first or
-		 * second player.
-		 */
-		else {
-			throw new IllegalArgumentException(
-				"player is not the first or second player."
+			return new OrderInfo(
+				!info.order().isFirstPlayersTurn(), PlayState.MOVE
 			);
 		}
 	}
