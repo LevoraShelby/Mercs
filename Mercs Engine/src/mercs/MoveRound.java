@@ -161,7 +161,8 @@ public class MoveRound {
 
 		return new PlayerInfo(
 			currentPlayerInfoBeforePlay.pieces(),
-			numPiecesCapturedInPlay,
+			currentPlayerInfoBeforePlay.numPiecesCaptured() 
+				+ numPiecesCapturedInPlay,
 			cooldown
 		);
 	}
