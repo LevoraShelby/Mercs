@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import main.Tile;
 import mercs.BuyRound;
-import mercs.MercsStartingGameInfo;
+import mercs.StandardMercsUtil;
 import mercs.PieceType;
 import mercs.PlayState;
 import mercs.info.GameInfo;
@@ -13,7 +13,7 @@ import mercs.info.GameInfo;
 
 public class RunningGame {
 	public static void main(String[] args) {
-		GameInfo info = MercsStartingGameInfo.startingInfo();
+		GameInfo info = StandardMercsUtil.startingInfo();
 		Scanner in = new Scanner(System.in);
 		while(
 			info.playerToInfo().get(1).numPiecesCaptured() < 8 &&

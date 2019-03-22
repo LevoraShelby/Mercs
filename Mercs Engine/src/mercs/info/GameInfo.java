@@ -100,6 +100,21 @@ public class GameInfo {
 
 
 	/**
+	 * @param isFirstPlayer 
+	 * @return If isFirstPlayer is true, this returns firstPlayerInfo; if it's
+	 * false if returns secondPlayerInfo;
+	 */
+	public PlayerInfo playerInfo(boolean isFirstPlayer) {
+		if(isFirstPlayer) {
+			return firstPlayerInfo;
+		}
+		else {
+			return secondPlayerInfo;
+		}
+	}
+
+
+	/**
 	 * @return The order of this game.
 	 */
 	public OrderInfo order() {

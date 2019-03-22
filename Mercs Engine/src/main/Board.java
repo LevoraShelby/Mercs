@@ -187,23 +187,21 @@ public final class Board {
 		Map<Integer, Tile> pieceToTile = 
 			new HashMap<Integer, Tile>(36);
 		/**
-		 * 0-17: white pieces, 17-35: black pieces
-		 * (0-5,18-23): pawns, (6-9,24-27): ferzes, (10-13,28-31): wazirs,
-		 * (14-15,32-33): knights, (16-17,34-35): commandos
+		 * 0-7: white pieces, 8-15: black pieces
+		 * (0-3,8-11): pawns, (4-5,6-7): wazirs,
+		 * (6,14): knights, (7,15): commandos
 		 */
 		List<Tile> pieceLocations = Arrays.asList(
-/**0-5*/	new Tile(2,2),new Tile(2,3),new Tile(2,4),new Tile(2,5),null,null,
-/**6-9*/	null,null,null,null,
-/**10-13*/	new Tile(1,2),new Tile(1,5),null,null,
-/**14-15*/	new Tile(1,3),null,
-/**16-17*/	new Tile(1,4),null,
-/**18-23*/	new Tile(5,2),new Tile(5,3),new Tile(5,4),new Tile(5, 5),null,null,
-/**24-27*/	null,null,null,null,
-/**28-31*/	new Tile(6,2),new Tile(6,5),null,null,
-/**32-33*/	new Tile(6,4),null,
-/**34-35*/	new Tile(6,3),null
+/**0-3*/	new Tile(2,2),new Tile(2,3),new Tile(2,4),new Tile(2,5),
+/**4-5*/	new Tile(1,2),new Tile(1,5),
+/**6*/		new Tile(1,3),
+/**7*/		new Tile(1,4),
+/**8-11*/	new Tile(5,2),new Tile(5,3),new Tile(5,4),new Tile(5, 5),
+/**12-13*/	new Tile(6,2),new Tile(6,5),
+/**14*/		new Tile(6,4),
+/**15*/		new Tile(6,3)
 		);		
-		for(Integer piece = 0; piece < 36; piece++) {
+		for(Integer piece = 0; piece < 16; piece++) {
 			pieceToTile.put(piece, pieceLocations.get(piece));
 		};
 
