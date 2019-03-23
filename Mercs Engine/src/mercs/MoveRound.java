@@ -8,9 +8,12 @@ import java.util.Set;
 import main.Board;
 import main.Move;
 import main.RecordBasedMoveLogic;
+import main.Tile;
 import mercs.info.GameInfo;
 import mercs.info.PieceInfo;
 import mercs.info.PlayerInfo;
+import mercs.pieceLogics.AlliedLogic;
+import mercs.pieceLogics.Mann;
 import mercs.info.OrderInfo;
 
 
@@ -77,19 +80,81 @@ public final class MoveRound {
 
 
 	/**
-	 * @param piece A piece of the current player's that is on the board.
+	 * @param playingPiece The piece that is making the play.
 	 * @param playIndex An index that points to a play in the array of plays
 	 * that the given piece can make.
 	 * @return The game of Mercs after the current player decides to make the
 	 * given play.
 	 */
-	public GameInfo play(Integer piece, int playIndex) {
-		Move[] play = pieceToPlays().get(piece)[playIndex];
+	public GameInfo play(Integer playingPiece, int playIndex) {
+		Move[] play = pieceToPlays().get(playingPiece)[playIndex];
 
 		Board board = newBoard(play);
 		Map<Integer, PieceInfo> pieceToInfo = newPieceToInfo(board, play);
 		Map<Integer, PlayerInfo> playerToInfo = newPlayerToInfo(play);
 		OrderInfo order = nextOrder();
+
+		//Promotes pieces if necessary
+		for(Integer pieceBeingPromoted : pieceToInfo.keySet()) {
+			//Checks that pieceBeingPromoted can be promoted
+			PieceType typeBeingPromoted = 
+				pieceToInfo.get(pieceBeingPromoted).type();
+			if(
+				typeBeingPromoted != PieceType.PAWN 
+				&& typeBeingPromoted != PieceType.COMMANDO
+			) {
+				continue;
+			}
+
+			//Checks that the piece is on the board
+			if(board.tileForPiece(pieceBeingPromoted) == null) {
+				continue;
+			}
+
+			/**
+			 * Checks that pieceForPromotion should be promoted (i.e. the piece
+			 * has reached the end of the board)
+			 * NOTE: This is a quick-and-dirty check. It only checks if there
+			 * is a tile ahead of the piece. It may need polishing for other
+			 * implementations.
+			 */
+			Tile tileAheadOfPiece;
+			boolean pieceIsWhite = 
+					playerToInfo.get(order.firstPlayer())
+					.pieces().contains(pieceBeingPromoted);
+			if(pieceIsWhite) {
+				tileAheadOfPiece = 
+					board.tileForPiece(pieceBeingPromoted)
+					.add(new Tile(1, 0));
+			}
+			else {
+				tileAheadOfPiece =
+					board.tileForPiece(pieceBeingPromoted)
+					.add(new Tile(-1, 0));
+			}
+			if(board.tiles().contains(tileAheadOfPiece)) {
+				continue;
+			}
+
+			//If all checks have been pass, the piece is promoted to a Mann.
+			Set<Integer> allyPieces;
+			if(pieceIsWhite) {
+				allyPieces = playerToInfo.get(order.firstPlayer()).pieces();
+			}
+			else {
+				allyPieces = playerToInfo.get(order.secondPlayer()).pieces();
+			}
+			pieceToInfo.put(
+				pieceBeingPromoted,
+				new PieceInfo(
+					typeBeingPromoted,
+					new AlliedLogic(
+						new Mann(pieceBeingPromoted, board),
+						allyPieces
+					)
+				)
+			);
+		}
 
 		return new GameInfo(board, pieceToInfo, playerToInfo, order);
 	}
