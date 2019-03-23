@@ -156,6 +156,17 @@ public final class MoveRound {
 			);
 		}
 
+		//Checks to see if the current player just won the game.
+		if(
+			playerToInfo.get(order.turn().currentPlayer())
+			.numPiecesCaptured() >= 8
+		) {
+			order = new OrderInfo(
+				new TurnState(order.turn().currentPlayer(), PlayState.WON),
+				order.firstPlayer(), order.secondPlayer()
+			);
+		}
+
 		return new GameInfo(board, pieceToInfo, playerToInfo, order);
 	}
 
