@@ -217,7 +217,8 @@ public class Display {
 		else if(type == PieceType.FERZ) return "\u265D";     //unicode bishop
 		else if(type == PieceType.WAZIR) return "\u265C";    //unicode rook
 		else if(type == PieceType.KNIGHT) return "\u265E";   //unicode knight
-		else if(type == PieceType.COMMANDO) return "\u265A"; //unicode king
+		else if(type == PieceType.COMMANDO) return "\u265B"; //unicode queen
+		else if(type == PieceType.MANN) return "\u265A";     //unicode king
 		else {
 			throw new IllegalArgumentException(
 				"piece is of an unsupported PieceType."
