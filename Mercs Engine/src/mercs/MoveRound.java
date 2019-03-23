@@ -147,7 +147,7 @@ public final class MoveRound {
 			pieceToInfo.put(
 				pieceBeingPromoted,
 				new PieceInfo(
-					typeBeingPromoted,
+					PieceType.MANN,
 					new AlliedLogic(
 						new Mann(pieceBeingPromoted, board),
 						allyPieces

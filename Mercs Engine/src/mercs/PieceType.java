@@ -5,5 +5,6 @@ public enum PieceType {
 	FERZ,
 	WAZIR,
 	KNIGHT,
-	COMMANDO
+	COMMANDO,
+	MANN
 }
