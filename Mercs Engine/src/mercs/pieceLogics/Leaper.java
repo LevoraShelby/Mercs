@@ -13,7 +13,7 @@ import main.Tile;
 
 
 /**
- * 
+ * https://en.wikipedia.org/wiki/Fairy_chess_piece#Leapers
  * @author trevor
  */
 public class Leaper implements RecordBasedMoveLogic {
