@@ -16,8 +16,7 @@ public class RunningGame {
 		GameInfo info = MercsStartingGameInfo.startingInfo();
 		Scanner in = new Scanner(System.in);
 		while(
-			info.playerToInfo().get(1).numPiecesCaptured() < 8 &&
-			info.playerToInfo().get(2).numPiecesCaptured() < 8
+			info.order().turn().playState() != PlayState.WON
 		) {
 			if(info.order().turn().playState() == PlayState.MOVE) {
 				info = MoveRoundPage.load(info, in);
