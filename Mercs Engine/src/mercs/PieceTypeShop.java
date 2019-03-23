@@ -65,18 +65,4 @@ public final class PieceTypeShop {
 	public boolean canPlayerBuy(Integer player) {
 		return playerToCooldown.get(player) == 0;
 	}
-
-
-	public static void main(String[] args) {
-		Map<Integer, Integer> playerToCooldown = 
-			new HashMap<Integer, Integer>();
-		playerToCooldown.put(0, 0);
-		playerToCooldown.put(1, 4);
-		System.out.println(playerToCooldown);
-
-		PieceTypeShop shop = new PieceTypeShop(playerToCooldown);
-		playerToCooldown = shop.buy(0, PieceType.KNIGHT);
-		System.out.println(playerToCooldown);
-		playerToCooldown.put(1, 0);
-	}
 }

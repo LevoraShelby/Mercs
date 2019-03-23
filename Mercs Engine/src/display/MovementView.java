@@ -1,9 +1,7 @@
 package display;
 
-import java.util.Arrays;
 import java.util.Map;
 
-import main.Move;
 import main.Tile;
 import mercs.info.GameInfo;
 
@@ -59,13 +57,6 @@ public class MovementView {
 
 
 	public MovementView select(Integer selectedPiece) {
-		//FIXME: REMOVE
-		if(selectedPiece != null) {
-			for(Move[] play : info.pieceToInfo().get(selectedPiece).logic().plays()) {
-				System.out.println(Arrays.deepToString(play));
-			}
-		}
-
 		if(this.selectedPiece == selectedPiece) {
 			return this;
 		}

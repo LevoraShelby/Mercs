@@ -1,9 +1,7 @@
 package mercs;
 
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import main.Board;
 import main.Move;
@@ -72,38 +70,5 @@ public class PiecePlacer {
 
 		//Places the piece on tile, constructing a new Board to be returned.
 		return board.makeMove(new Move(pieceBeingPlaced, tile));
-	}
-
-
-	public static void main(String[] args) {
-		List<Tile> pieceLocations = new ArrayList<Tile>();
-		pieceLocations.add(new Tile(1, 1));
-		pieceLocations.add(new Tile(5, 5));
-		pieceLocations.add(null);
-		pieceLocations.add(null);
-
-		Board board = Board.squareBoard(5, pieceLocations);
-
-		Map<Integer, PieceType> pieceToType = new HashMap<Integer, PieceType>();
-		pieceToType.put(0, PieceType.WAZIR);
-		pieceToType.put(1, PieceType.PAWN);
-		pieceToType.put(2, PieceType.PAWN);
-		pieceToType.put(3, PieceType.KNIGHT);
-
-		PiecePlacer placer = new PiecePlacer(board, pieceToType);
-
-		System.out.println(board);
-
-		board = placer.placePiece(PieceType.KNIGHT, new Tile(2, 2));
-		placer = new PiecePlacer(board, pieceToType);
-		System.out.println(board);
-
-		board = placer.placePiece(PieceType.PAWN, new Tile(1, 1));
-		placer = new PiecePlacer(board, pieceToType);
-		System.out.println(board);
-
-		board = placer.placePiece(PieceType.WAZIR, new Tile(5, 2));
-		placer = new PiecePlacer(board, pieceToType);
-		System.out.println(board);
 	}
 }
