@@ -241,13 +241,19 @@ public final class MoveRound {
 			}
 		}
 
+		//Reduces the current player's cooldown if it isn't zero.
+		int cooldown = info.playerToInfo().get(currentPlayer).cooldown();
+		if(cooldown > 0) {
+			cooldown--;
+		}
+
 		//Adds the pieces that current player captured to their total.
 		PlayerInfo currentPlayerInfo = info.playerToInfo().get(currentPlayer);
 		currentPlayerInfo = new PlayerInfo(
 			currentPlayerInfo.pieces(),
 			currentPlayerInfo.numPiecesCaptured()
 				+ numPiecesCapturedDuringPlay,
-			currentPlayerInfo.cooldown()
+			cooldown
 		);
 
 		playerToInfo.put(currentPlayer, currentPlayerInfo);
